@@ -318,6 +318,11 @@ function drawClouds(t){
 
 function loop(t=0){ drawStars(); drawMoonSun(); drawClouds(t); requestAnimationFrame(loop); } loop();
 let lastScroll=0; addEventListener('scroll',()=>{ const dy=Math.abs(scrollY-lastScroll); layers.forEach(L=>L.speed=0.2+dy*0.02); lastScroll=scrollY; setTimeout(()=>layers.forEach(L=>L.speed=Math.max(0.2,L.speed*0.92)),200); });
-</script>
+<script>
+// --- FIX: make DOM ids available as globals (for Safari) ---
+['t_brand','t_nav_live','t_nav_atlas','t_nav_stories','t_lang_label','t_h1','t_lead',
+ 't_badge_clouds','t_badge_dynamic','t_cta_start','t_cta_read','t_local_time','t_note_notmap',
+ 't_atlas','t_stories','t_story_para','t_footer_brand','t_footer_made','starGrid','now','y',
+ 'langSel','phase'].forEach(id => { window[id] = document.getElementById(id); });
 </body>
 </html>
