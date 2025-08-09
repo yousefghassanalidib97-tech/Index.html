@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SamaObservatory — المرصد التفاعلي متعدد اللغات</title>
+<meta name="description" content="SamaObservatory — تجربة فلكية تتغيّر مع أوقات النهار (صباح/نهار/عصر/غروب/ليل)، بعدة لغات.">
+
+<style>
+/* ===== ألوان وثيم كل مرحلة زمنية ===== */
+:root{
+  --bg:#050A17; --ink:#EAF2FF; --muted:#AFC3E6; --panel:#0A132A; --border:#142240;
+  --primary:#7CB8FF; --accent:#FFD38A; --chip:#0A1426; --card1:#0B1530; --card2:#081024;
+  --glow:rgba(124,184,255,.5);
+}
+body.morning{
+  --bg:#EAF4FF; --ink:#0E1B32; --muted:#4B5F88; --panel:#fff; --border:#D6E4FF;
+  --primary:#2B4F8F; --accent:#F7C76A; --chip:#F2F7FF; --card1:#fff; --card2:#F5FAFF;
+}
+body.day{
+  --bg:#E3F0FF; --ink:#12203A; --muted:#4F648D; --panel:#fff; --border:#D0E0FF;
+  --primary:#2A4F8F; --accent:#F5C46C; --chip:#F3F8FF; --card1:#fff; --card2:#F7FBFF;
+}
+body.afternoon{
+  --bg:#F3F6FF; --ink:#16223A; --muted:#5B6C92; --panel:#fff; --border:#E4ECFF;
+  --primary:#2C487A; --accent:#FDBA74; --chip:#F8FBFF; --card1:#fff; --card2:#F8FBFF;
+}
+body.sunset{
+  --bg:#2B2141; --ink:#FFE9F1; --muted:#CDB6D6; --panel:#2D2548; --border:#3D2F5C;
+  --primary:#F0A3B7; --accent:#FF9E66; --chip:#3A2B57; --card1:#32265A; --card2:#2A204B;
+  --glow:rgba(255,158,102,.45);
+}
+body.night{
+  --bg:#050A17; --ink:#EAF2FF; --muted:#AFC3E6; --panel:#0A132A; --border:#142240;
+  --primary:#7CB8FF; --accent:#FFD38A; --chip:#0A1426; --card1:#0B1530; --card2:#081024;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+  font-family: ui-sans-serif,-apple-system,Segoe UI,Tahoma,Arial,"Noto Naskh Arabic","Noto Sans",sans-serif; overflow-x:hidden}
+h1,h2,.brand-title{letter-spacing:.08em;text-transform:uppercase;font-weight:900}
+:lang(ar) h1,:lang(ar) h2,:lang(ur) h1,:lang(ur) h2,.rtlCaps{text-transform:none;letter-spacing:.03em;font-weight:800}
+a{color:inherit;text-decoration:none}
+
+.container{max-width:1200px;margin:0 auto;padding:20px}
+.header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 0;position:relative;z-index:2}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800}
+.brand .logo{width:38px;height:38px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#fff 0%,#DDEBFF 30%,#9EC7FF 45%,#2B4D8F 60%,#0B1530 80%);
+  box-shadow:0 0 18px var(--glow)}
+.brand-title{font-size:18px}
+.nav{display:flex;gap:14px;color:var(--muted);font-size:14px}
+.lang{display:flex;gap:6px;align-items:center}
+select{border:1px solid var(--border);background:var(--chip);color:var(--ink);border-radius:10px;padding:8px 10px}
+
+.btn{display:inline-block;padding:10px 14px;border-radius:12px;border:1px solid var(--border);
+     background:linear-gradient(180deg,var(--card1),var(--card2));color:var(--ink)}
+.btn.primary{background:linear-gradient(180deg,#2A4F8F,#163466);border-color:#2A4F8F;box-shadow:0 8px 24px rgba(124,184,255,.25)}
+body.sunset .btn.primary{background:linear-gradient(180deg,#E27A6A,#C35A50)}
+
+.hero{position:relative;min-height:70vh;display:grid;grid-template-columns:1.1fr .9fr;gap:18px;align-items:center}
+@media (max-width:980px){.hero{grid-template-columns:1fr;min-height:60vh}.nav{display:none}}
+.intro{position:relative;z-index:2;background:color-mix(in oklab,var(--panel) 85%,transparent);backdrop-filter: blur(6px);
+       border:1px solid var(--border);border-radius:18px;padding:18px}
+h1{margin:0 0 10px;font-size:30px;line-height:1.4}
+.lead{color:var(--muted);margin:6px 0 12px}
+.actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+
+.section{position:relative;z-index:2;margin:22px 0}
+h2{margin:0 0 8px;font-size:18px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:980px){.grid{grid-template-columns:1fr}}
+.card{background:linear-gradient(180deg,var(--card1),var(--card2));border:1px solid var(--border);
+      border-radius:16px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.meta{color:var(--muted);font-size:13px}
+.tag{display:inline-block;font-size:11px;border:1px solid var(--border);background:var(--chip);color:#6FA2FF;
+     padding:4px 8px;border-radius:999px;margin-inline-start:6px}
+footer{color:var(--muted);text-align:center;padding:26px 0;border-top:1px solid var(--border);margin-top:24px;position:relative;z-index:2}
+
+/* الخلفية المتحركة */
+.scene{position:fixed;inset:0;overflow:hidden;z-index:0}
+#stars,#clouds,#moonSun{position:absolute;inset:0}
+.vignette{position:fixed;inset:0;pointer-events:none;background:
+  radial-gradient(circle at 50% 120%, transparent 30%, rgba(0,0,0,.35) 70%),
+  linear-gradient(180deg, rgba(0,0,0,.0), rgba(0,0,0,.25));z-index:1}
+body.morning .vignette{background: radial-gradient(circle at 50% 120%, rgba(255,255,255,.0) 30%, rgba(0,0,0,.08) 70%), linear-gradient(180deg, rgba(255,255,255,.0), rgba(0,0,0,.05))}
+body.day .vignette{background: radial-gradient(circle at 50% 120%, rgba(255,255,255,.0) 30%, rgba(0,0,0,.05) 70%), linear-gradient(180deg, rgba(255,255,255,.0), rgba(0,0,0,.03))}
+body.afternoon .vignette{background: radial-gradient(circle at 50% 120%, rgba(255,255,255,.0) 30%, rgba(0,0,0,.08) 70%), linear-gradient(180deg, rgba(255,255,255,.0), rgba(0,0,0,.04))}
+body.sunset .vignette{background: radial-gradient(circle at 50% 120%, rgba(255,120,100,.15) 30%, rgba(0,0,0,.35) 70%), linear-gradient(180deg, rgba(0,0,0,.0), rgba(0,0,0,.25))}
+</style>
+</head>
+
+<body class="night">
+  <div class="scene">
+    <canvas id="stars"></canvas>
+    <canvas id="moonSun"></canvas>
+    <canvas id="clouds"></canvas>
+  </div>
+  <div class="vignette"></div>
+
+  <div class="container">
+    <header class="header">
+      <div class="brand">
+        <div class="logo"></div>
+        <div class="brand-title" id="t_brand">SamaObservatory | المرصد التفاعلي</div>
+      </div>
+      <nav class="nav">
+        <a href="#live" id="t_nav_live">السماء الآن</a>
+        <a href="#atlas" id="t_nav_atlas">أطلس النجوم</a>
+        <a href="#stories" id="t_nav_stories">حكايا السماء</a>
+      </nav>
+      <div class="lang">
+        <label for="langSel" class="meta" id="t_lang_label">اللغة</label>
+        <select id="langSel" aria-label="Language">
+          <option value="ar" selected>العربية</option>
+          <option value="en">English</option>
+          <option value="hi">हिन्दी</option>
+          <option value="ur">اردو</option>
+          <option value="zh">中文</option>
+        </select>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="intro">
+        <h1 id="t_h1" class="rtlCaps">مشاهدة فلكية تتبدّل مع أوقات النهار — سماء، قمر و☁️ غيوم</h1>
+        <p class="lead" id="t_lead">تجربة فوق الغيوم تتبدّل بصريًا مع الصباح والنهار والعصر والغروب والليل. نموذج أولي أنيق يعمل دون إنترنت، تمهيدًا لربطه ببيانات سماوية حيّة.</p>
+        <div class="badges">
+          <span class="chip" id="t_badge_clouds">☁️ غيوم متحركة بطبقات</span>
+          <span class="chip" id="t_badge_dynamic">تغيّر بصري حسب الوقت</span>
+        </div>
+        <div class="actions">
+          <a class="btn primary" href="#atlas" id="t_cta_start">ابدأ الاستكشاف</a>
+          <a class="btn" href="#stories" id="t_cta_read">اقرأ الحكايات</a>
+          <!-- تبديل يدوي للمراحل للتجربة -->
+          <select id="phase" class="btn" style="padding:8px 10px">
+            <option value="">الزمن تلقائي</option>
+            <option value="morning">صباح</option>
+            <option value="day">نهار</option>
+            <option value="afternoon">عصر</option>
+            <option value="sunset">غروب</option>
+            <option value="night">ليل</option>
+          </select>
+        </div>
+      </div>
+      <div class="card" id="live">
+        <div class="meta"><span id="t_local_time">الوقت المحلي</span>: <span id="now"></span></div>
+        <div class="meta" style="margin-top:6px" id="t_note_notmap">هذه محاكاة فنية — ليست خريطة سماوية دقيقة بعد. سنربط بيانات حقيقية لاحقًا.</div>
+      </div>
+    </section>
+
+    <section id="atlas" class="section">
+      <h2 id="t_atlas">أطلس النجوم</h2>
+      <div class="grid" id="starGrid"></div>
+    </section>
+
+    <section id="stories" class="section">
+      <h2 id="t_stories">حكايا السماء</h2>
+      <div class="card">
+        <p id="t_story_para">سنعرض لاحقًا قصص الكوكبات وروابط لمصادر موثوقة مثل NASA وESO. هذه النسخة مبدئية للتصميم والتجربة.</p>
+      </div>
+    </section>
+
+    <footer>© <span id="y"></span> <span id="t_footer_brand">SamaObservatory</span> — <span id="t_footer_made">صنع لعشّاق السماء</span> • samaobservatory.com</footer>
+  </div>
+
+<script>
+/* ==== ترجمات مختصرة (AR/EN/HI/UR/ZH) ==== */
+const I18N={
+  ar:{brand:"SamaObservatory | المرصد التفاعلي",nav_live:"السماء الآن",nav_atlas:"أطلس النجوم",nav_stories:"حكايا السماء",lang_label:"اللغة",
+    h1:"مشاهدة فلكية تتبدّل مع أوقات النهار — سماء، قمر و☁️ غيوم",lead:"تجربة فوق الغيوم تتبدّل بصريًا مع الصباح والنهار والعصر والغروب والليل.",
+    badge_clouds:"☁️ غيوم متحركة بطبقات",badge_dynamic:"تغيّر بصري حسب الوقت",cta_start:"ابدأ الاستكشاف",cta_read:"اقرأ الحكايات",
+    local_time:"الوقت المحلي",note_notmap:"هذه محاكاة فنية — ليست خريطة سماوية دقيقة بعد.",atlas:"أطلس النجوم",stories:"حكايا السماء",
+    story_para:"قريبًا: قصص الكوكبات وروابط NASA/ESO.",footer_brand:"SamaObservatory",footer_made:"صنع لعشّاق السماء",
+    stars:[{name:"الشِّعرى اليمانية",tag:"الكلب الأكبر",meta:"ألمع نجوم السماء — نظام ثنائي."},
+           {name:"منكب الجوزاء",tag:"الجبار",meta:"عملاق فائق أحمر؛ خفّ لمعانه 2019–2020."},
+           {name:"النجم القطبي",tag:"الدب الأصغر",meta:"قريب من القطب السماوي الشمالي."}]},
+  en:{brand:"SamaObservatory | Interactive Observatory",nav_live:"Live Sky",nav_atlas:"Star Atlas",nav_stories:"Sky Tales",lang_label:"Language",
+    h1:"A time-aware sky — horizon, moon and ☁️ clouds",lead:"Above-the-clouds visuals that shift through morning, day, afternoon, sunset and night.",
+    badge_clouds:"☁️ Layered moving clouds",badge_dynamic:"Time-based visuals",cta_start:"Start Exploring",cta_read:"Read Tales",
+    local_time:"Local Time",note_notmap:"Artistic simulation — not a precise star map yet.",atlas:"Star Atlas",stories:"Sky Tales",
+    story_para:"Constellation stories and NASA/ESO links coming soon.",footer_brand:"SamaObservatory",footer_made:"Made for stargazers",
+    stars:[{name:"Sirius",tag:"Canis Major",meta:"Brightest star — binary with a white dwarf."},
+           {name:"Betelgeuse",tag:"Orion",meta:"Red supergiant; notable dimming 2019–2020."},
+           {name:"Polaris",tag:"Ursa Minor",meta:"Near the north celestial pole."}]},
+  hi:{brand:"SamaObservatory | इंटरएक्टिव वेधशाला",nav_live:"लाइव आकाश",nav_atlas:"तारामंडल",nav_stories:"आकाश कथाएँ",lang_label:"भाषा",
+    h1:"समय के साथ बदलता आकाश — क्षितिज, चाँद और ☁️ बादल",lead:"सुबह, दिन, दोपहर, सूर्यास्त और रात में दृश्य बदलता है.",
+    badge_clouds:"☁️ परतदार गतिमान बादल",badge_dynamic:"समय-आधारित दृश्य",cta_start:"शुरू करें",cta_read:"कथाएँ पढ़ें",
+    local_time:"स्थानीय समय",note_notmap:"यह अभी कलात्मक सिमुलेशन है.",atlas:"तारामंडल",stories:"आकाश कथाएँ",
+    story_para:"जल्द ही कहानियाँ और NASA/ESO लिंक.",footer_brand:"SamaObservatory",footer_made:"सितारों के चाहने वालों के लिए",
+    stars:[{name:"Sirius",tag:"कैनिस मेजर",meta:"सबसे चमकीला — श्वेत बौना साथी."},
+           {name:"Betelgeuse",tag:"ओरायन",meta:"लाल महादानव; 2019–2020 में धुंधलापन."},
+           {name:"Polaris",tag:"उर्सा माइनर",meta:"उत्तरी ध्रुव के पास."}]},
+  ur:{brand:"SamaObservatory | انٹرایکٹو آبزرویٹری",nav_live:"زندہ آسمان",nav_atlas:"ستاروں کا اطلس",nav_stories:"آسمانی کہانیاں",lang_label:"زبان",
+    h1:"وقت کے ساتھ بدلتا آسمان — افق، چاند اور ☁️ بادل",lead:"صبح، دن، عصر، غروب اور رات میں منظر بدلتا ہے.",
+    badge_clouds:"☁️ تہہ دار متحرک بادل",badge_dynamic:"وقت پر مبنی مناظر",cta_start:"ایکسپلور شروع کریں",cta_read:"کہانیاں پڑھیں",
+    local_time:"مقامی وقت",note_notmap:"یہ فی الحال فنی سمیولیشن ہے.",atlas:"ستاروں کا اطلس",stories:"آسمانی کہانیاں",
+    story_para:"جلد NASA/ESO روابط.",footer_brand:"SamaObservatory",footer_made:"ستاروں کے شائقین کے لیے",
+    stars:[{name:"سِیریس",tag:"کینس میجر",meta:"روشن ترین — سفید بونے کے ساتھ دوہرا نظام."},
+           {name:"بیٹیل جیوس",tag:"اوریون",meta:"سرخ عظیم دیو؛ 2019–2020 میں مدھم."},
+           {name:"پولارس",tag:"ارسہ مائنر",meta:"شمالی قطب کے قریب."}]},
+  zh:{brand:"SamaObservatory | 互动天文台",nav_live:"实时天空",nav_atlas:"星图",nav_stories:"天空故事",lang_label:"语言",
+    h1:"随时间变化的天空——地平线、月亮与☁️云层",lead:"清晨、白昼、午后、日落与夜晚的视觉变化。",
+    badge_clouds:"☁️ 分层移动的云",badge_dynamic:"基于时间的视觉",cta_start:"开始探索",cta_read:"阅读故事",
+    local_time:"本地时间",note_notmap:"目前为艺术化模拟。",atlas:"星图",stories:"天空故事",
+    story_para:"即将加入 NASA/ESO 链接。",footer_brand:"SamaObservatory",footer_made:"为观星者打造",
+    stars:[{name:"天狼星",tag:"大犬座",meta:"最亮恒星，与白矮星成联星。"},
+           {name:"参宿四",tag:"猎户座",meta:"红色超巨星；2019–2020 变暗。"},
+           {name:"北极星",tag:"小熊座",meta:"靠近天球北极。"}]}
+};
+
+/* تطبيق اللغة */
+function applyLang(lang){
+  const L = I18N[lang] || I18N.ar;
+  t_brand.innerHTML=L.brand; t_nav_live.textContent=L.nav_live; t_nav_atlas.textContent=L.nav_atlas; t_nav_stories.textContent=L.nav_stories;
+  t_lang_label.textContent=L.lang_label; t_h1.innerHTML=L.h1; t_lead.textContent=L.lead;
+  t_badge_clouds.textContent=L.badge_clouds; t_badge_dynamic.textContent=L.badge_dynamic;
+  t_cta_start.textContent=L.cta_start; t_cta_read.textContent=L.cta_read;
+  t_local_time.textContent=L.local_time; t_note_notmap.textContent=L.note_notmap;
+  t_atlas.textContent=L.atlas; t_stories.textContent=L.stories; t_story_para.innerHTML=L.story_para;
+  t_footer_brand.textContent=L.footer_brand; t_footer_made.textContent=L.footer_made;
+
+  const grid=starGrid; grid.innerHTML="";
+  L.stars.forEach(s=>{ const d=document.createElement('div'); d.className="card";
+    d.innerHTML=`<strong>${s.name}</strong> <span class="tag">${s.tag}</span><div class="meta">${s.meta}</div>`;
+    grid.appendChild(d);
+  });
+
+  const rtl=(lang==='ar'||lang==='ur');
+  document.documentElement.lang=lang; document.documentElement.dir=rtl?'rtl':'ltr';
+  document.querySelectorAll('.brand-title').forEach(el=> rtl?el.classList.add('rtlCaps'):el.classList.remove('rtlCaps'));
+}
+langSel.onchange=()=>applyLang(langSel.value);
+(function(){ const n=(navigator.language||'ar').slice(0,2).toLowerCase(); if(I18N[n]) langSel.value=n; applyLang(langSel.value); })();
+
+/* الساعة + تحديد المرحلة الزمنية */
+function tick(){ const d=new Date(); now.textContent=d.toLocaleString(document.documentElement.lang||'ar',{hour12:false}); applyTimeTheme(d); }
+setInterval(tick,1000); tick(); y.textContent=new Date().getFullYear();
+
+function phaseOf(d){
+  const h=d.getHours()+d.getMinutes()/60;
+  if(h>=5 && h<9) return 'morning';
+  if(h>=9 && h<15.5) return 'day';
+  if(h>=15.5 && h<17.5) return 'afternoon';
+  if(h>=17.5 && h<19) return 'sunset';
+  return 'night';
+}
+let manualPhase=null;
+function applyTimeTheme(d){
+  const ph = manualPhase || phaseOf(d);
+  document.body.className=ph;
+  starsVisible = (ph==='night'||ph==='sunset');
+}
+phase.onchange=()=>{ manualPhase=phase.value||null; applyTimeTheme(new Date()); };
+
+/* الخلفية: نجوم/قمر/شمس/غيوم */
+const cs=document.getElementById('stars').getContext('2d');
+const cm=document.getElementById('moonSun').getContext('2d');
+const cc=document.getElementById('clouds').getContext('2d');
+let W=innerWidth,H=innerHeight;
+function sizeAll(){ W=innerWidth;H=innerHeight; ['stars','moonSun','clouds'].forEach(id=>{const c=document.getElementById(id); c.width=W;c.height=H;}); }
+addEventListener('resize',sizeAll); sizeAll();
+
+let stars=[], starsVisible=true;
+function makeStars(n=320){ stars=Array.from({length:n},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.4+0.2,a:Math.random()*Math.PI*2,s:Math.random()*0.02+0.005})); }
+makeStars();
+function drawStars(){ cs.clearRect(0,0,W,H); if(!starsVisible) return;
+  for(const st of stars){ st.a+=st.s; const tw=(Math.sin(st.a*6)+1)/2; cs.beginPath(); cs.arc(st.x,st.y,st.r+tw*0.6,0,Math.PI*2); cs.fillStyle=`rgba(200,220,255,${0.55+tw*0.45})`; cs.fill(); } }
+
+function drawMoonSun(){
+  cm.clearRect(0,0,W,H);
+  const ph=document.body.className; const R=Math.min(W,H)*0.18;
+  let cx=W*0.22, cy=H*0.28; if(ph==='afternoon') cy=H*0.35; if(ph==='sunset'){ cy=H*0.42; cx=W*0.18; }
+  const dayLike=(ph==='morning'||ph==='day'||ph==='afternoon');
+  if(dayLike){
+    let k=(ph==='afternoon')?1.1:(ph==='day'?1.0:0.9);
+    let g=cm.createRadialGradient(cx,cy,R*0.2,cx,cy,R*1.2*k);
+    g.addColorStop(0,'rgba(255,255,200,.95)'); g.addColorStop(.5,'rgba(255,230,140,.65)'); g.addColorStop(1,'rgba(255,220,120,.0)');
+    cm.fillStyle=g; cm.beginPath(); cm.arc(cx,cy,R*1.4,0,Math.PI*2); cm.fill();
+    g=cm.createRadialGradient(cx-R*0.2,cy-R*0.2,R*0.2,cx,cy,R);
+    g.addColorStop(0,'#FFF6B8'); g.addColorStop(.5,'#FFE08A'); g.addColorStop(1,'#FFD166');
+    cm.fillStyle=g; cm.beginPath(); cm.arc(cx,cy,R,0,Math.PI*2); cm.fill();
+  }else{
+    let grad=cm.createRadialGradient(cx,cy,R*0.2,cx,cy,R*1.1);
+    grad.addColorStop(0,'rgba(255,255,255,.7)'); grad.addColorStop(.3,'rgba(226,238,255,.35)'); grad.addColorStop(1,'rgba(10,20,40,.0)');
+    cm.fillStyle=grad; cm.beginPath(); cm.arc(cx,cy,R*1.4,0,Math.PI*2); cm.fill();
+    grad=cm.createRadialGradient(cx-R*0.2,cy-R*0.2,R*0.2,cx,cy,R);
+    grad.addColorStop(0,'#FFFFFF'); grad.addColorStop(.5,'#E9F1FF'); grad.addColorStop(1,'#C9D8F5');
+    cm.fillStyle=grad; cm.beginPath(); cm.arc(cx,cy,R,0,Math.PI*2); cm.fill();
+    for(let i=0;i<12;i++){ const a=Math.random()*Math.PI*2; const rr=R*(Math.random()*0.08+0.03); const rx=cx+Math.cos(a)*R*(Math.random()*0.7); const ry=cy+Math.sin(a)*R*(Math.random()*0.7);
+      const g2=cm.createRadialGradient(rx,ry,rr*0.2,rx,ry,rr); g2.addColorStop(0,'rgba(120,130,155,.45)'); g2.addColorStop(1,'rgba(40,60,100,.1)'); cm.fillStyle=g2; cm.beginPath(); cm.arc(rx,ry,rr,0,Math.PI*2); cm.fill(); }
+  }
+}
+
+let layers=[];
+function makeClouds(){ layers=[0.2,0.45,0.8].map((speed,idx)=>{ const blobs=[]; const count=26+idx*10;
+  for(let i=0;i<count;i++){ blobs.push({x:Math.random()*W,y:H*0.55+Math.random()*H*0.6-idx*H*0.08,r:80+Math.random()*220,o:0.10+Math.random()*0.18}); }
+  return {speed,blobs,offset:Math.random()*W}; }); }
+makeClouds();
+function drawClouds(t){
+  cc.clearRect(0,0,W,H); const ph=document.body.className;
+  layers.forEach((L,i)=>{
+    const base = ph==='sunset'?0.35: ph==='afternoon'?0.25: ph==='day'?0.3: ph==='morning'?0.28:0.18;
+    L.offset=(L.offset+base+L.speed*0.02)%(W*2);
+    for(const b of L.blobs){
+      const x=(b.x-L.offset+W*2)%(W*2)-W;
+      const y=b.y+Math.sin((t*0.0002+x*0.0008)+(i*0.6))*8;
+      const grad=cc.createRadialGradient(x,y,b.r*0.3,x,y,b.r);
+      if(ph==='sunset'){ grad.addColorStop(0,`rgba(255,180,150,${0.45*b.o})`); grad.addColorStop(1,`rgba(80,40,90,0)`); }
+      else if(ph==='afternoon'){ grad.addColorStop(0,`rgba(255,240,220,${0.55*b.o})`); grad.addColorStop(1,`rgba(210,190,170,0)`); }
+      else if(ph==='day'||ph==='morning'){ grad.addColorStop(0,`rgba(255,255,255,${0.65*b.o})`); grad.addColorStop(1,`rgba(200,220,255,0)`); }
+      else { grad.addColorStop(0,`rgba(255,255,255,${0.35*b.o})`); grad.addColorStop(1,`rgba(180,200,230,0)`); }
+      cc.fillStyle=grad; cc.beginPath(); cc.arc(x,y,b.r,0,Math.PI*2); cc.fill();
+    }
+  });
+}
+
+function loop(t=0){ drawStars(); drawMoonSun(); drawClouds(t); requestAnimationFrame(loop); } loop();
+let lastScroll=0; addEventListener('scroll',()=>{ const dy=Math.abs(scrollY-lastScroll); layers.forEach(L=>L.speed=0.2+dy*0.02); lastScroll=scrollY; setTimeout(()=>layers.forEach(L=>L.speed=Math.max(0.2,L.speed*0.92)),200); });
+</script>
+</body>
+</html>
